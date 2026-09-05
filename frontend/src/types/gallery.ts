@@ -3,4 +3,5 @@ export interface Gallery{
     name: string
     description: string
     artworkCount: number
+    artworkIds: string[]
 }

@@ -6,6 +6,7 @@ import HomePage from '@/pages/HomePage'
 import UploadPage from '@/pages/UploadPage'
 import NotFoundPage from "@/pages/NotFoundPage";
 import ArtworkDetailPage from "@/pages/ArtworkDetailPage";
+import GalleryDetailPage from "@/pages/GalleryDetailPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="galleries" element={<GalleriesPage />} />
         <Route path="upload" element={<UploadPage />} />
         <Route path="artworks/:artworkId" element={<ArtworkDetailPage />} />
+        <Route path="galleries/:galleryId" element={<GalleryDetailPage />} />
       </Route>
        <Route path="*" element={<NotFoundPage />} />
     </Routes>

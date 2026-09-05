@@ -1,24 +1,9 @@
 import CreateGalleryDialog from "@/components/gallery/CreateGalleryDialog"
 import GalleryCard from "@/components/gallery/GalleryCard"
-import { mockGalleries } from "@/data/mockGalleries"
-import type { Gallery } from "@/types/gallery"
-import { useState } from "react"
+import { useGalleries } from "@/contexts/GalleryContext"
 
 function GalleriesPage(){
-    const [galleries, setGalleries] = useState(mockGalleries)
-
-    function handleCreateGallery(
-        gallery: Pick<Gallery, 'name' | 'description'>,
-    ) {
-        setGalleries((currentGalleries) => [
-            {
-                id: crypto.randomUUID(),
-                artworkCount: 0,
-                ...gallery,
-            },
-            ...currentGalleries,
-        ])
-    }
+    const { galleries, createGallery } = useGalleries()
 
     return (
         <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -30,7 +15,7 @@ function GalleriesPage(){
                     </p>
                 </div>
 
-                <CreateGalleryDialog onCreate={handleCreateGallery}/>
+                <CreateGalleryDialog onCreate={createGallery}/>
             </div>
 
             <section
