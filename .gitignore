@@ -1,0 +1,11 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Django development files
+backend/db.sqlite3
+backend/staticfiles/
