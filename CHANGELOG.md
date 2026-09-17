@@ -2,6 +2,16 @@
 
 All notable changes to PinArt are documented in this file.
 
+## v0.3.0 - 2026-09-17
+
+### Added
+
+- Local PostgreSQL database configuration
+- Psycopg PostgreSQL driver configuration
+- Environment-based database settings using `python-dotenv`
+- Safe `backend/.env.example` configuration template
+- PostgreSQL migrations and test-database support
+
 ## v0.2.0 - 2026-09-14
 
 ### Added

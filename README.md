@@ -4,11 +4,11 @@
 
 ## Current Milestone
 
-**v0.2 - Django Backend and REST API**
+**v0.3 - PostgreSQL Database Configuration**
 
 PinArt is inspired by Pinterest and focuses on discovering artwork, viewing artwork details, and organizing pieces into personal galleries.
 
-The project currently has a static React frontend and a Django REST API backed by a local SQLite database.
+The project currently has a static React frontend and a Django REST API backed by a local PostgreSQL database.
 
 ## Features
 
@@ -61,7 +61,9 @@ DELETE /api/galleries/<id>/
 - Python
 - Django
 - Django REST Framework
-- SQLite
+- PostgreSQL
+- Psycopg
+- python-dotenv
 - Django ORM
 
 ## Getting Started
@@ -76,24 +78,22 @@ npm run dev
 
 ### Backend
 
+Create your local environment file from the safe template:
+
 ```powershell
 cd backend
+Copy-Item .env.example .env
+```
+
+Open `.env` and replace `replace-with-your-real-password` with your PostgreSQL password. Adjust `POSTGRES_BIN_PATH` if PostgreSQL is installed in a different location.
+
+Then install dependencies and run the backend:
+
+```powershell
 ..\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
-```
-
-The backend runs at:
-
-```text
-http://127.0.0.1:8000/
-```
-
-Django Admin is available at:
-
-```text
-http://127.0.0.1:8000/admin/
 ```
 
 ## Testing
@@ -107,8 +107,8 @@ python manage.py check
 
 ## Current Limitations
 
+- PostgreSQL must be installed and running locally.
 - The frontend still uses mock data and is not connected to the API.
-- SQLite is for local development; PostgreSQL is planned for v0.3.
 - Authentication and authorization are not implemented.
 - Gallery creation currently accepts an owner ID in the request body; this is temporary until authentication is added.
 - Artwork uploads and persistent image storage are not implemented.
