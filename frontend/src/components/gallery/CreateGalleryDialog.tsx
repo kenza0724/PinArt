@@ -16,15 +16,17 @@ import { useState, type FormEvent } from "react";
 import { Plus } from "lucide-react";
 
 interface CreateGalleryDialogProps {
-    onCreate: (gallery: Pick<Gallery, 'name' | 'description'>) => void
+    onCreate: (gallery: Pick<Gallery, 'name' | 'description'>) => Promise<boolean>
+    creating: boolean
 }
 
-function CreateGalleryDialog({ onCreate }: CreateGalleryDialogProps) {
+function CreateGalleryDialog({ onCreate, creating}: CreateGalleryDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
+    const [submitError, setSubmitError] = useState<string | null>(null)
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
         const trimmedName = name.trim()
@@ -33,10 +35,17 @@ function CreateGalleryDialog({ onCreate }: CreateGalleryDialogProps) {
             return
         }
 
-        onCreate({
+        setSubmitError(null);
+
+        const success = await onCreate({
             name: trimmedName,
-            description: description.trim() || 'A new PinArt collection.'
+            description: description.trim()
         })
+
+        if(!success){
+            setSubmitError('Unable to create gallery. Please try again.')
+            return
+        }
 
         setName('')
         setDescription('')
@@ -59,6 +68,11 @@ function CreateGalleryDialog({ onCreate }: CreateGalleryDialogProps) {
                         Group artwork into a collection you can return to later.
                     </DialogDescription>
                 </DialogHeader>
+                {submitError && (
+                    <p className="text-sm text-destructive" role="alert">
+                        {submitError}
+                    </p>
+                )}
 
                 <form id="create-gallery-form" className="grid gap-4" onSubmit={handleSubmit}>
                     <div className="grid gap-2">
@@ -83,8 +97,8 @@ function CreateGalleryDialog({ onCreate }: CreateGalleryDialogProps) {
                     </div>
                 </form>
                 <DialogFooter>
-                    <Button type="submit" form="create-gallery-form">
-                        Create gallery
+                    <Button type="submit" form="create-gallery-form" disabled={creating}>
+                        {creating ? 'Creating...' : 'Create gallery'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

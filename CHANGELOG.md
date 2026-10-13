@@ -2,6 +2,23 @@
 
 All notable changes to PinArt are documented in this file.
 
+## v0.4.0 - 2026-10-13
+
+### Added
+
+- Connected the React frontend to the Django REST API
+- Loaded artworks from the backend API
+- Loaded artwork detail data from the backend API
+- Loaded galleries from PostgreSQL through the API
+- Created persistent galleries through the API
+- Edited galleries through PATCH requests
+- Deleted galleries through DELETE requests
+- Added gallery loading, error, and empty states
+- Added gallery creation and editing dialogs
+- Added gallery deletion confirmation
+- Added frontend API request error handling
+- Added Vite development proxy for `/api` requests
+
 ## v0.3.0 - 2026-09-17
 
 ### Added

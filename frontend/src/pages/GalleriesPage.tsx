@@ -2,8 +2,8 @@ import CreateGalleryDialog from "@/components/gallery/CreateGalleryDialog"
 import GalleryCard from "@/components/gallery/GalleryCard"
 import { useGalleries } from "@/contexts/GalleryContext"
 
-function GalleriesPage(){
-    const { galleries, createGallery } = useGalleries()
+function GalleriesPage() {
+    const { galleries, createGallery, loading, error, creating } = useGalleries()
 
     return (
         <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -15,17 +15,37 @@ function GalleriesPage(){
                     </p>
                 </div>
 
-                <CreateGalleryDialog onCreate={createGallery}/>
+                <CreateGalleryDialog onCreate={createGallery} creating={creating} />
             </div>
 
-            <section
-                className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                aria-label="Your galleries"
-            >
-                {galleries.map((gallery) => (
-                    <GalleryCard key={gallery.id} gallery={gallery}/>
-                ))}
-            </section>
+            {loading && (
+                <p className="mt-8 text-muted-foreground" role="status">
+                    Loading galleries...
+                </p>
+            )}
+
+            {error && (
+                <p className="mt-8 text-destructive" role="alert">
+                    {error}
+                </p>
+            )}
+
+            {!loading && !error && galleries.length === 0 && (
+                <p className="mt-8 text-muted-foreground">
+                    No galleries available yet.
+                </p>
+            )}
+
+            {!loading && !error && galleries.length > 0 && (
+                <section
+                    className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                    aria-label="Your galleries"
+                >
+                    {galleries.map((gallery) => (
+                        <GalleryCard key={gallery.id} gallery={gallery} />
+                    ))}
+                </section>
+            )}
         </main>
     )
 }

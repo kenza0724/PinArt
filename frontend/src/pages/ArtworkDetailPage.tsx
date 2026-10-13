@@ -1,12 +1,25 @@
+import { getArtwork } from "@/api/artworks"
 import { Button } from "@/components/ui/button"
-import { mockArtworks } from "@/data/mockArtworks"
+import type { Artwork } from "@/types/artwork"
 import { ArrowLeft } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router"
 
 function ArtworkDetailPage() {
     const { artworkId } = useParams()
+    const [artwork, setArtwork] = useState<Artwork | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
-    const artwork = mockArtworks.find((item) => item.id === artworkId)
+    useEffect(() => {
+        if (!artworkId){
+            return
+        }
+        getArtwork(artworkId)
+        .then(setArtwork)
+        .catch(() => setError('Artwork not found'))
+        .finally(() => setLoading(false))
+    }, [artworkId])
 
     if (!artwork) {
         return (
@@ -28,6 +41,15 @@ function ArtworkDetailPage() {
                 </Link>
             </Button>
 
+             {loading && (
+                <p className="mt-8 text-muted-foreground" role="status">Loading artwork..</p>
+            )}
+
+            {error && (
+                <p className="mt-8 text-destructive" role="alert">{error}</p>
+            )}
+
+            {!loading && !error && artwork && (
             <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:items-start">
                 <div className="rounded-xl border bg-muted">
                     <img src={artwork.imageUrl} alt={artwork.altText} className="max-h-[70vh] w-full object-contain" />
@@ -45,6 +67,7 @@ function ArtworkDetailPage() {
                     </p>
                 </div>
             </div>
+            )}
         </main>
     )
 }
