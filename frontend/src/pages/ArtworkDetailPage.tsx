@@ -1,75 +1,85 @@
-import { getArtwork } from "@/api/artworks"
-import { Button } from "@/components/ui/button"
-import type { Artwork } from "@/types/artwork"
-import { ArrowLeft } from "lucide-react"
-import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router"
+import { getArtwork } from "@/api/artworks";
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
+import { Link, useParams } from "react-router";
 
 function ArtworkDetailPage() {
-    const { artworkId } = useParams()
-    const [artwork, setArtwork] = useState<Artwork | null>(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+  const { artworkId } = useParams();
+  const {
+    data: artwork,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ["artwork", artworkId],
+    queryFn: () => getArtwork(artworkId!),
+  });
 
-    useEffect(() => {
-        if (!artworkId){
-            return
-        }
-        getArtwork(artworkId)
-        .then(setArtwork)
-        .catch(() => setError('Artwork not found'))
-        .finally(() => setLoading(false))
-    }, [artworkId])
+ if (isPending) {
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <p className="text-muted-foreground" role="status">
+        Loading artwork...
+      </p>
+    </main>
+  )
+}
 
-    if (!artwork) {
-        return (
-            <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-                <h1 className="text-3xl font-bold tracking-tight">Artwork not found</h1>
-                <Button asChild className="mt-6" variant="outline">
-                    <Link to="/explore">Return to Explore</Link>
-                </Button>
-            </main>
-        )
-    }
+if (isError) {
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <p className="text-destructive" role="alert">
+        Unable to load artwork.
+      </p>
+    </main>
+  )
+}
 
-    return (
-        <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-            <Button asChild variant="ghost">
-                <Link to="/explore">
-                    <ArrowLeft aria-hidden="true" />
-                    Back to Explore
-                </Link>
-            </Button>
+if (!artwork) {
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <h1 className="text-3xl font-bold tracking-tight">
+        Artwork not found
+      </h1>
+      <Button asChild className="mt-6" variant="outline">
+        <Link to="/explore">Return to Explore</Link>
+      </Button>
+    </main>
+  )
+}
 
-             {loading && (
-                <p className="mt-8 text-muted-foreground" role="status">Loading artwork..</p>
-            )}
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <Button asChild variant="ghost">
+        <Link to="/explore">
+          <ArrowLeft aria-hidden="true" />
+          Back to Explore
+        </Link>
+      </Button>
 
-            {error && (
-                <p className="mt-8 text-destructive" role="alert">{error}</p>
-            )}
+        <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:items-start">
+          <div className="rounded-xl border bg-muted">
+            <img
+              src={artwork.imageUrl}
+              alt={artwork.altText}
+              className="max-h-[70vh] w-full object-contain"
+            />
+          </div>
 
-            {!loading && !error && artwork && (
-            <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:items-start">
-                <div className="rounded-xl border bg-muted">
-                    <img src={artwork.imageUrl} alt={artwork.altText} className="max-h-[70vh] w-full object-contain" />
-                </div>
-
-                <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                        By {artwork.artistName}
-                    </p>
-                    <h1 className="mt-2 text-4xl font-bold tracking-tight">
-                        {artwork.title}
-                    </h1>
-                    <p className="mt-6 leading-7 text-muted-foreground">
-                        {artwork.description}
-                    </p>
-                </div>
-            </div>
-            )}
-        </main>
-    )
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              By {artwork.artistName}
+            </p>
+            <h1 className="mt-2 text-4xl font-bold tracking-tight">
+              {artwork.title}
+            </h1>
+            <p className="mt-6 leading-7 text-muted-foreground">
+              {artwork.description}
+            </p>
+          </div>
+        </div>
+    </main>
+  );
 }
 
 export default ArtworkDetailPage

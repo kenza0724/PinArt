@@ -1,22 +1,17 @@
 import { getArtworks } from "@/api/artworks"
 import ArtworkCard from "@/components/artwork/ArtworkCard"
-import type { Artwork } from "@/types/artwork"
-import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 
 function ExplorePage() {
-    const [artworks, setArtworks] = useState<Artwork[]>([])
-    const [loading, setLoading] = useState<boolean>(true)
-    const [error, setError] = useState<string | null>(null)
 
-    useEffect(() => {
-        getArtworks()
-            .then(setArtworks)
-            .catch(() => {
-                setError('Unable to load artwork.')
-            })
-            .finally(() => setLoading(false))
-    }, [])
-
+    const {
+        data: artworks = [],
+        isPending,
+        isError,
+    } = useQuery({
+        queryKey: ["artworks"],
+        queryFn: getArtworks,
+    })
 
     return (
         <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
@@ -25,19 +20,19 @@ function ExplorePage() {
                 Discover artwork from the PinArt community.
             </p>
 
-            {loading && (
+            {isPending && (
                 <p className="mt-8 text-muted-foreground" role="status">Loading artworks..</p>
             )}
 
-            {error && (
-                <p className="mt-8 text-destructive" role="alert">{error}</p>
+            {isError && (
+                <p className="mt-8 text-destructive" role="alert">Unable to load artwork.</p>
             )}
 
-            {!loading && !error && artworks.length === 0 && (
+            {!isPending && !isError && artworks.length === 0 && (
                 <p className="mt-8 text-destructive">No artwork available yet</p>
             )}
 
-            {!loading && !error && artworks.length > 0 && (
+            {!isPending && !isError && artworks.length > 0 && (
                 <section
                     className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                     aria-label="Artwork feed"

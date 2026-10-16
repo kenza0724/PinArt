@@ -5,11 +5,10 @@ import {
   updateGallery as updateGalleryRequest,
 } from "@/api/galleries";
 import type { Gallery } from "@/types/gallery";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   useContext,
-  useEffect,
-  useState,
   type ReactNode,
 } from "react";
 
@@ -29,77 +28,86 @@ interface GalleryContextValue {
   deleteGallery: (id: string) => Promise<boolean>;
 }
 
+type GalleryFormData = Pick<Gallery, "name" | "description">;
+
+interface UpdateGalleryVariables {
+  id: string;
+  data: GalleryFormData;
+}
+
 const GalleryContext = createContext<GalleryContextValue | null>(null);
 
 export function GalleryProvider({ children }: { children: ReactNode }) {
-  const [galleries, setGalleries] = useState<Gallery[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [creating, setCreating] = useState<boolean>(false);
-  const [updating, setUpdating] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    getGalleries()
-      .then(setGalleries)
-      .catch(() => {
-        setError("Unable to load galleries.");
+  const galleriesQuery = useQuery({
+    queryKey: ["galleries"],
+    queryFn: getGalleries,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (gallery: GalleryFormData) =>
+      createGalleryRequest({
+        owner: 1,
+        ...gallery,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["galleries"],
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: UpdateGalleryVariables) =>
+      updateGalleryRequest(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["galleries"],
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteGalleryRequest(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["galleries"],
       })
-      .finally(() => setLoading(false));
-  }, []);
+    }
+  })
 
   async function createGallery(
-    gallery: Pick<Gallery, "name" | "description">,
+    gallery: GalleryFormData,
   ): Promise<boolean> {
-    setCreating(true);
     try {
-      const createdGallery = await createGalleryRequest({
-        owner: 1,
-        name: gallery.name,
-        description: gallery.description,
-      });
-      setGalleries((currentGalleries) => [createdGallery, ...currentGalleries]);
+      await createMutation.mutateAsync(gallery);
       return true;
     } catch {
       return false;
-    } finally {
-      setCreating(false);
     }
   }
 
   async function updateGallery(
     id: string,
-    gallery: Pick<Gallery, "name" | "description">,
+    gallery: GalleryFormData,
   ): Promise<boolean> {
-    setUpdating(true);
     try {
-      const updatedGallery = await updateGalleryRequest(id, {
-        name: gallery.name,
-        description: gallery.description,
-      });
-      setGalleries((currentGalleries) =>
-        currentGalleries.map((currentGallery) =>
-          currentGallery.id === id ? updatedGallery : currentGallery,
-        ),
-      );
+      await updateMutation.mutateAsync({
+        id,
+        data: gallery,
+      })
       return true;
     } catch {
-      setError("Unable to update gallery.");
       return false;
-    } finally {
-      setUpdating(false);
     }
   }
 
   async function deleteGallery(id: string): Promise<boolean> {
-    setError(null);
     try {
-      await deleteGalleryRequest(id);
-      setGalleries((currentGalleries) =>
-        currentGalleries.filter((gallery) => gallery.id !== id),
-      );
+      await deleteMutation.mutateAsync(id)
       return true;
     } catch {
-      setError("Unable to delete gallery.");
       return false;
     }
   }
@@ -107,14 +115,16 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
   return (
     <GalleryContext.Provider
       value={{
-        galleries,
+        galleries: galleriesQuery.data ?? [],
         createGallery,
         updateGallery,
         deleteGallery,
-        loading,
-        error,
-        creating,
-        updating,
+        loading: galleriesQuery.isPending,
+        error: galleriesQuery.isError
+        ? "Unable to load galleries."
+        : null,
+        creating: createMutation.isPending,
+        updating: updateMutation.isPending,
       }}
     >
       {children}

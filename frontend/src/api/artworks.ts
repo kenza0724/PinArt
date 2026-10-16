@@ -29,7 +29,7 @@ export async function getArtworks() : Promise<Artwork[]>{
 }
 
 export async function getArtwork(id : string) : Promise<Artwork>{
-    const response = await fetch(`/api/artworks/${id}`)
+    const response = await fetch(`/api/artworks/${id}/`)
     
     if (!response.ok) {
         throw new Error('Failed to load artworks')

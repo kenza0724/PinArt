@@ -4,11 +4,11 @@
 
 ## Current Milestone
 
-**v0.4 - Connect React to the Django REST API**
+**v0.5 - TanStack Query server-state management**
 
 PinArt is inspired by Pinterest and focuses on discovering artwork, viewing artwork details, and organizing pieces into personal galleries.
 
-The project currently has a React frontend connected to a Django REST API backed by a local PostgreSQL database.
+The project currently has a React frontend connected to a Django REST API backed by a local PostgreSQL database. TanStack Query manages artwork and gallery server state, including caching, loading states, error states, and query invalidation after gallery mutations.
 
 ## Features
 
@@ -23,6 +23,8 @@ The project currently has a React frontend connected to a Django REST API backed
 - Gallery detail pages
 - Image preview in the Upload Artwork form
 - Responsive navigation, dialogs, and dropdown menus
+- TanStack Query for artwork and gallery server-state management
+- Query invalidation after gallery create, edit, and delete operations
 
 ### Backend API
 
@@ -59,6 +61,7 @@ DELETE /api/galleries/<id>/
 - Radix UI
 - React Router
 - ESLint
+- TanStack Query
 
 ### Backend
 
@@ -108,6 +111,7 @@ python manage.py runserver
 cd frontend
 npm run lint
 npx tsc --noEmit -p tsconfig.app.json
+```
 
 From `backend`:
 
@@ -125,15 +129,14 @@ python manage.py check
 - Artwork pinning is not implemented yet.
 - Gallery artwork contents still use placeholder/mock data.
 - Artwork uploads and persistent image storage are not implemented.
-- TanStack Query has not been introduced yet.
 
 ## Roadmap
 
 - v0.1: Static React frontend prototype
 - v0.2: Django REST API
 - v0.3: PostgreSQL configuration
-- v0.4: Connect React to the backend API <----
-- v0.5: TanStack Query
+- v0.4: Connect React to the backend API
+- v0.5: TanStack Query <----
 - v0.6: Authentication and authorization
 - v0.7: Real artwork uploads
 - v0.8: Artwork pinning

@@ -2,6 +2,19 @@
 
 All notable changes to PinArt are documented in this file.
 
+## v0.5.0 - 2026-10-16
+
+### Added
+
+- Added TanStack Query for frontend server-state management
+- Added `QueryClientProvider` to the application entry point
+- Added artwork queries for the Explore page
+- Added artwork detail queries
+- Added gallery queries in `GalleryContext`
+- Added gallery mutations for create, update, and delete operations
+- Added query invalidation after gallery mutations
+- Added query-based loading and error state handling
+
 ## v0.4.0 - 2026-10-13
 
 ### Added
